@@ -4,15 +4,25 @@ import { URL } from 'url';
 
 import dotenv from 'dotenv';
 import { commandHandler } from './command';
+import { Player } from 'discord-player';
+import { commandList } from './command/cmd_list';
 dotenv.config();
+
+
+// Get the custom ffmpeg path from the environment variable
+const ffmpegPath = process.env.FFMPEG_PATH;
+
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates,
     ]
 });
+
+new Player(client);
 
 client.once(Events.ClientReady, readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
@@ -23,6 +33,7 @@ client.on("messageCreate", async message => {
     // Check if the message starts with the command prefix
     if (message.content.startsWith(String(process.env.PREFIX))) {
         // Extract the command and arguments
+        if (message.content.startsWith(String(process.env.PREFIX) + ' ')) return message.reply(`Command not found, please check ${String(process.env.PREFIX)}help`);
         const args = message.content.slice(String(process.env.PREFIX).length).trim().split(/ +/);
         const command = args.shift()?.toLowerCase();
 
@@ -31,7 +42,8 @@ client.on("messageCreate", async message => {
         commandHandler({
             command,
             args: args.join(' '),
-            Message: message
+            Message: message,
+            client
         })
     }
 })
