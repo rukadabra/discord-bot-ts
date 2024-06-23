@@ -1,15 +1,17 @@
-import { Message } from "discord.js";
+import { Client, Message } from "discord.js";
 
 
 export type CommandTypes = {
     command: string;
     args: string;
     Message: Message
+    client: Client
 }
 
 export type selectedCommand = {
-    args: string;
+    args?: string;
     Message: Message
+    client: Client
 }
 
 export type CommandDetails = {
